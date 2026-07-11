@@ -36,13 +36,13 @@ const ffmpeg = spawnSync("ffmpeg", [
   "-y",
   "-i", webm,
   "-t", "15",
-  "-vf", "fps=30,scale=1280:720:flags=lanczos,format=yuv420p",
+  "-vf", "scale=1920:1080:flags=lanczos,minterpolate=fps=60:mi_mode=blend,format=yuv420p",
   "-c:v", "libx264",
-  "-preset", "slow",
+  "-preset", "fast",
   "-crf", "18",
   "-movflags", "+faststart",
   "-an",
   mp4,
 ], { stdio: "inherit" });
 if (ffmpeg.status !== 0) process.exit(ffmpeg.status ?? 1);
-console.log(`Recorded ${mp4}`);
+console.log(`Recorded ${mp4} at 1920x1080 / 60 fps`);
