@@ -1,0 +1,53 @@
+{
+  "name": "release-room",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Evidence-backed release assurance for small AI-native startup teams.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "tsx scripts/run-e2e.ts",
+    "quality": "npm run lint && npm run typecheck && npm test && npm run build",
+    "quality:full": "npm run quality && npm run e2e",
+    "marketing:capture": "tsx scripts/capture-marketing.ts",
+    "marketing:record": "tsx scripts/record-marketing.ts",
+    "db:reset": "tsx scripts/reset-db.ts",
+    "sync:providers": "tsx scripts/sync-providers.ts",
+    "editor:report": "node scripts/release-room-cli.mjs",
+    "smoke:integrations": "node scripts/smoke-live-integrations.mjs"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "lucide-react": "^0.468.0",
+    "next": "16.2.10",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.57.0",
+    "@sparticuz/chromium": "^138.0.2",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.3",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "16.2.10",
+    "tailwindcss": "^4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4"
+  },
+  "type": "module",
+  "overrides": {
+    "postcss": "8.5.16"
+  },
+  "bin": {
+    "release-room": "scripts/release-room-cli.mjs"
+  }
+}
