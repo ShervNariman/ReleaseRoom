@@ -1,0 +1,5 @@
+---
+description: Release Room execution and model-routing rules
+alwaysApply: true
+---
+Use Grok 4.5 Very Fast for routine implementation and tests. Reserve Sonnet 5 for final architecture, difficult defects, security cleanup, and interface polish. Keep the release gate deterministic. Run `npm run quality` before handing work to QA. Never expose secrets or raw provider payloads in the UI.
