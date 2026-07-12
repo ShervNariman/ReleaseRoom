@@ -1,13 +1,13 @@
 # Release Room v3 production readiness
 
 Date: 2026-07-12
-Scope: controlled single-owner private beta/pilot
+Scope: controlled single-owner or very small trusted-team private beta/pilot
 Repository: `ShervNariman/ReleaseRoom`
 Manager: Linear `SHE-93`
 
 ## Executive decision
 
-Release Room is being hardened for controlled pilot use. It must not be described as multi-tenant, public-GA, or fully self-serve until the residual boundaries below are deliberately resolved.
+Release Room is production-oriented for controlled pilot use. It must not be described as multi-tenant, public-GA, open source, or fully self-serve until the residual boundaries below are deliberately resolved.
 
 The release decision engine remains deterministic. Provider and AI output may contribute evidence or explanation, but cannot independently decide whether a release passes.
 
@@ -15,35 +15,40 @@ The release decision engine remains deterministic. Provider and AI output may co
 
 ### Corrected
 
-- Provider backfill now derives repository, PR, Linear issue, commit, and preview context from each release.
-- Vercel refresh no longer falls back to the newest unrelated deployment.
+- Provider backfill derives repository, PR, Linear issue, commit, and preview context from each release.
+- Vercel refresh never falls back to the newest unrelated deployment.
 - GitHub refresh excludes Release Room's own outbound readiness check from CI evidence.
-- Event-to-release matching now uses deterministic precedence and requires a unique match.
+- Running or inconclusive GitHub checks remain pending instead of becoming false failures.
+- Event-to-release matching uses deterministic precedence and requires a unique match.
 - Repository-only webhook events do not attach evidence to the latest release.
 - Sequential duplicate provider deliveries are rejected before evidence mutation.
 - Integration status distinguishes configured credentials from a verified connected provider.
+- The supported GitHub pilot path is a least-privilege token and/or signed webhook. Unimplemented GitHub App credentials are not advertised.
 
-### Required validation
+### Validation coverage
 
-- Signed GitHub, Linear, and Vercel happy paths
+- Signed GitHub, Linear, and Vercel verification contracts
 - Duplicate-delivery regression
 - Unmatched and ambiguous event behavior
-- Slow, unavailable, and malformed provider behavior
+- Slow, unavailable, malformed, pending, and failed provider behavior
+- Release-specific context parsing and cross-repository PR rejection
 
 ## Loop 2 — security and data integrity
 
 ### Corrected
 
-- Session cookies now contain a signed issue time and enforce a server-validated 14-day lifetime.
+- Session cookies contain a signed issue time and enforce a server-validated 14-day lifetime.
+- Private mutation server actions enforce the session internally.
 - Access-key attempts receive bounded per-instance throttling.
 - Production response headers include CSP, HSTS, frame denial, MIME sniffing prevention, referrer policy, and a restricted permissions policy.
 - Liveness and database readiness are separate endpoints.
 - Integration event list limits are bounded.
-- Hosted mode still requires explicit access, session, and webhook secrets.
+- Hosted mode requires explicit access, session, and generic evidence-webhook secrets.
+- Provider payloads are bounded and signatures are checked before normalized processing.
 
 ### Residual boundary
 
-Login throttling is process-local. A horizontally scaled deployment should move abuse controls to an edge/WAF or shared durable store before public exposure.
+Login throttling is process-local. A horizontally scaled deployment should move abuse controls to an edge/WAF or shared durable store before public exposure. Sequential replay protection is covered; distributed crash-safe exactly-once processing is not claimed.
 
 ## Loop 3 — real-user workflow and accessibility
 
@@ -51,16 +56,18 @@ Login throttling is process-local. A horizontally scaled deployment should move 
 
 - The integration screen explains fixture, configured, connected, stale, and degraded states.
 - A token or secret alone no longer creates a false green state.
-- The page exposes the first/last verified event, event count, endpoint, access boundary, and last error.
+- The page exposes verified activity, event count, endpoint, access boundary, and last error.
 - Activation guidance tells users to link each release to its own provider records.
+- Release creation validates repository, PR ownership, Linear issue, commit SHA, branch, preview, and repository-relative changed-file paths.
+- Validation errors are announced inline and each integration identifier is explained.
 - Marketing and repository copy distinguish a public repository from a private product beta.
 
-### Required validation
+### Validation coverage
 
-- Founder can create and understand a release without builder guidance.
-- Desktop and 390px mobile workflows pass.
-- Keyboard and automated accessibility checks pass.
-- Empty, validation, provider-error, stale, and unauthorized states remain understandable.
+- Founder creates and understands a release without builder guidance.
+- Desktop and 390px mobile workflows.
+- Keyboard-oriented interaction and automated accessibility checks.
+- Empty, validation, provider-error, stale, unauthorized, and first-event states.
 
 ## Loop 4 — performance, resilience, and dependencies
 
@@ -69,17 +76,21 @@ Login throttling is process-local. A horizontally scaled deployment should move 
 - Provider refresh uses `Promise.allSettled` and records provider-specific errors without discarding successful evidence.
 - Database indexes cover common repository, commit, and recent-event access paths.
 - Readiness detects failed database initialization.
-- The full gate includes a production dependency audit.
+- Integration event reads are bounded.
+- Provider reads and GitHub check publishing use hard timeouts.
+- `package-lock.json` is committed and CI uses reproducible `npm ci` installs with read-only repository permission.
+- The full gate includes a production dependency audit and retained failure diagnostics.
 
-### Reproducibility requirement
+### Capacity boundary
 
-The original repository did not contain `package-lock.json`. The first v3 CI run generates and exports a lockfile. That lockfile must be committed, CI must move to `npm ci`, and the export-only step must be removed before final approval.
+Current queries and inline event processing are appropriate for a controlled pilot. Larger multi-tenant volume requires pagination throughout the product, durable queues/outbox processing, backpressure, shared rate controls, and operational alerting.
 
 ## Loop 5 — independent QA and release review
 
-The final gate must pass in a clean GitHub Actions environment:
+The final gate runs in a clean GitHub Actions environment:
 
 - standalone workspace verification
+- locked dependency installation
 - ESLint with zero warnings
 - strict TypeScript
 - unit and integration contracts
@@ -90,11 +101,11 @@ The final gate must pass in a clean GitHub Actions environment:
 - production dependency audit
 - independent changed-file review
 
-No merge is allowed while critical/high findings remain or the CI gate is red.
+No merge is allowed while critical/high findings remain, any final gate execution is red, or the manager has not recorded the go decision. The final validated head is executed through the complete gate five times.
 
 ## Current supported pilot boundary
 
-- One trusted owner or very small trusted team
+- One trusted owner or a very small trusted team
 - One deployment with environment-managed provider credentials
 - Release-specific GitHub, Linear, and Vercel evidence
 - Signed provider and generic evidence ingestion
@@ -105,9 +116,10 @@ No merge is allowed while critical/high findings remain or the CI gate is red.
 
 - Multi-tenant data isolation
 - Organization membership and role-based access control
-- OAuth installation and customer-managed integration lifecycle
+- GitHub App or provider OAuth installation lifecycle
 - Durable distributed rate limiting
 - Per-tenant encryption and secret vaulting
+- Durable queue/outbox ingestion and exactly-once guarantees
 - Billing, subscriptions, support tooling, or a public SLA
 - Automatic Vercel production promotion or enforcement
 - Formal compliance certification or penetration-test attestation
