@@ -12,7 +12,9 @@ function repositoryFromPullRequest(url: string | null | undefined) {
   if (!url) return null;
   try {
     const parsed = new URL(url);
-    const match = parsed.pathname.match(/^\/([^/]+)\/([^/]+)\/pull\/\d+\/?$/i);
+    const match = parsed.pathname.match(
+      /^\/([^/]+)\/([^/]+)\/pull\/\d+\/?$/i,
+    );
     return match ? `${match[1]}/${match[2]}` : null;
   } catch {
     return null;
@@ -20,7 +22,11 @@ function repositoryFromPullRequest(url: string | null | undefined) {
 }
 
 function normalizeRepository(value: string | null | undefined) {
-  const trimmed = value?.trim().replace(/^https?:\/\/github\.com\//i, "").replace(/\.git$/i, "").replace(/^\/+|\/+$/g, "");
+  const trimmed = value
+    ?.trim()
+    .replace(/^https?:\/\/github\.com\//i, "")
+    .replace(/\.git$/i, "")
+    .replace(/^\/+|\/+$/g, "");
   return trimmed && /^[^/\s]+\/[^/\s]+$/.test(trimmed) ? trimmed : null;
 }
 
@@ -34,22 +40,32 @@ function pullRequestNumber(url: string | null | undefined) {
   }
 }
 
-function linearIssueId(url: string | null | undefined) {
+export function linearIssueIdentifier(url: string | null | undefined) {
   if (!url) return null;
   try {
-    const parts = new URL(url).pathname.split("/").filter(Boolean);
-    const issueIndex = parts.findIndex((part) => part.toLowerCase() === "issue");
-    return issueIndex >= 0 && parts[issueIndex + 1] ? parts[issueIndex + 1] : null;
+    const parsed = new URL(url);
+    if (parsed.hostname.toLowerCase() !== "linear.app") return null;
+    const parts = parsed.pathname.split("/").filter(Boolean);
+    const issueIndex = parts.findIndex(
+      (part) => part.toLowerCase() === "issue",
+    );
+    return issueIndex >= 0 && parts[issueIndex + 1]
+      ? decodeURIComponent(parts[issueIndex + 1])
+      : null;
   } catch {
     return null;
   }
 }
 
-export function releaseIntegrationContext(release: ReleaseCandidate): ReleaseIntegrationContext {
+export function releaseIntegrationContext(
+  release: ReleaseCandidate,
+): ReleaseIntegrationContext {
   return {
-    repository: normalizeRepository(release.repository) ?? repositoryFromPullRequest(release.prUrl),
+    repository:
+      normalizeRepository(release.repository) ??
+      repositoryFromPullRequest(release.prUrl),
     pullRequestNumber: pullRequestNumber(release.prUrl),
-    linearIssueId: linearIssueId(release.linearUrl),
+    linearIssueId: linearIssueIdentifier(release.linearUrl),
     commitSha: release.commitSha,
     previewUrl: release.previewUrl ?? null,
   };
