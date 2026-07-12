@@ -15,8 +15,6 @@ const schema = z.object({
   DATABASE_AUTH_TOKEN: z.string().optional(),
   GITHUB_TOKEN: z.string().optional(),
   GITHUB_WEBHOOK_SECRET: z.string().min(16).optional(),
-  GITHUB_APP_ID: z.string().optional(),
-  GITHUB_APP_PRIVATE_KEY: z.string().optional(),
   GITHUB_CHECKS_ENABLED: z.enum(["true", "false"]).default("false"),
   LINEAR_API_KEY: z.string().optional(),
   LINEAR_WEBHOOK_SECRET: z.string().min(16).optional(),
