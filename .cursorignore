@@ -1,0 +1,13 @@
+node_modules/
+.next/
+test-results/
+playwright-report/
+*.db
+*.db-shm
+*.db-wal
+.env
+.env.*
+!.env.example
+marketing/video/raw/
+marketing/video/scenes/
+*.tsbuildinfo
