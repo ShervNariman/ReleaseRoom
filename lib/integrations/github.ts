@@ -2,16 +2,22 @@ import { env } from "@/lib/env";
 import { RELEASE_ROOM_CHECK_NAME } from "@/lib/integrations/github-checks";
 import { releaseIntegrationContext } from "@/lib/integrations/context";
 import { fetchJson } from "@/lib/integrations/http";
-import type { EvidenceItem, ReleaseCandidate } from "@/lib/types";
+import type {
+  EvidenceItem,
+  EvidenceStatus,
+  ReleaseCandidate,
+} from "@/lib/types";
+
+export type GitHubCheck = {
+  name: string;
+  conclusion: string | null;
+  details_url?: string;
+  html_url?: string;
+};
 
 type CheckRuns = {
   total_count: number;
-  check_runs: Array<{
-    name: string;
-    conclusion: string | null;
-    details_url?: string;
-    html_url?: string;
-  }>;
+  check_runs: GitHubCheck[];
 };
 
 type Reviews = Array<{
@@ -20,6 +26,15 @@ type Reviews = Array<{
   html_url?: string;
   submitted_at?: string;
 }>;
+
+const passingConclusions = new Set(["success", "neutral", "skipped"]);
+const failingConclusions = new Set([
+  "failure",
+  "cancelled",
+  "timed_out",
+  "action_required",
+  "startup_failure",
+]);
 
 function repositoryPath(repository: string) {
   return repository
@@ -37,6 +52,25 @@ function latestApproval(reviews: Reviews) {
   return [...latestByReviewer.values()].find(
     (review) => review.state.toUpperCase() === "APPROVED",
   );
+}
+
+export function githubCheckStatus(checks: GitHubCheck[]): EvidenceStatus {
+  if (checks.length === 0) return "pending";
+  if (
+    checks.some((check) =>
+      failingConclusions.has((check.conclusion ?? "").toLowerCase()),
+    )
+  ) {
+    return "failed";
+  }
+  if (
+    checks.every((check) =>
+      passingConclusions.has((check.conclusion ?? "").toLowerCase()),
+    )
+  ) {
+    return "passed";
+  }
+  return "pending";
 }
 
 export async function githubEvidence(
@@ -60,25 +94,27 @@ export async function githubEvidence(
   const relevantChecks = checks.check_runs.filter(
     (run) => run.name !== RELEASE_ROOM_CHECK_NAME,
   );
-  const passed =
-    relevantChecks.length > 0 &&
-    relevantChecks.every((run) =>
-      ["success", "neutral", "skipped"].includes(run.conclusion ?? ""),
-    );
+  const status = githubCheckStatus(relevantChecks);
   const successfulCount = relevantChecks.filter((run) =>
-    ["success", "neutral", "skipped"].includes(run.conclusion ?? ""),
+    passingConclusions.has((run.conclusion ?? "").toLowerCase()),
   ).length;
+  const pendingCount = relevantChecks.filter(
+    (run) => !run.conclusion,
+  ).length;
+  const description =
+    relevantChecks.length === 0
+      ? "No external GitHub checks were reported for this commit."
+      : status === "pending"
+        ? `${successfulCount}/${relevantChecks.length} GitHub checks passed; ${pendingCount || relevantChecks.length - successfulCount} still pending or inconclusive.`
+        : `${successfulCount}/${relevantChecks.length} GitHub checks passed.`;
+
   const items: Array<Omit<EvidenceItem, "id" | "releaseId">> = [
     {
       key: "ci",
       category: "engineering",
       label: "CI checks",
-      description:
-        relevantChecks.length === 0
-          ? "No external GitHub checks were reported for this commit."
-          : `${successfulCount}/${relevantChecks.length} GitHub checks passed.`,
-      status:
-        relevantChecks.length === 0 ? "pending" : passed ? "passed" : "failed",
+      description,
+      status,
       required: true,
       source: "GitHub",
       sourceUrl:
