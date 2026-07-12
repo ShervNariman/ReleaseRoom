@@ -1,9 +1,11 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+const accessKey = process.env.RELEASE_ROOM_ACCESS_KEY ?? "release-room-private";
+
 async function login(page: import("@playwright/test").Page) {
   await page.goto("/login");
-  await page.fill('input[name="accessKey"]', "release-room-private");
+  await page.fill('input[name="accessKey"]', accessKey);
   await page.click('button[type="submit"]');
   await page.waitForURL("/");
 }
