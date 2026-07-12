@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { accessKey, sessionSecret } from "@/lib/env";
 
 const COOKIE = "release-room-session";
@@ -57,6 +58,10 @@ export async function hasSession() {
   const store = await cookies();
   const value = store.get(COOKIE)?.value;
   return value ? verifySessionToken(value) : false;
+}
+
+export async function requireSession() {
+  if (!(await hasSession())) redirect("/login");
 }
 
 export async function clearSession() {
