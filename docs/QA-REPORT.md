@@ -1,43 +1,82 @@
-# Independent QA Report — Private MVP
+# Independent QA Report — v3 production hardening
 
 ## Scope
 
-The QA lane validated the deterministic release policy, decision output, webhook integrity, private authentication flow, persistent release workflow, responsive product interface, recording route, and production build.
+The QA lane validates the controlled-pilot release across deterministic policy behavior, provider matching, signed ingestion, authentication, release creation, evidence mutation, decision history, production build, responsive workflows, accessibility, and dependency health.
 
-## Automated results
+## Required automated gate
 
-| Gate | Result |
-|---|---:|
-| ESLint | Pass, zero warnings |
+Every final stability pass runs the same clean GitHub Actions job:
+
+| Gate | Required result |
+|---|---|
+| Standalone workspace verification | Pass |
+| Locked `npm ci` install | Pass |
+| ESLint | Pass with zero warnings |
 | Strict TypeScript | Pass |
-| Unit tests | 12 passed |
+| Unit and integration contracts | Pass |
 | Production build | Pass |
-| Desktop browser flows | 5 passed |
-| Mobile responsive flows | 4 passed, 1 desktop-only mutation test skipped by design |
-| Accessibility smoke | No critical or serious axe-core violations |
-| Production dependency audit | 0 vulnerabilities |
+| Desktop browser workflows | Pass |
+| 390px mobile workflows | Pass, with only explicitly desktop-only capture/mutation cases skipped |
+| Automated accessibility | No critical or serious axe-core findings |
+| Production dependency audit | Pass at high severity threshold |
 
-## Adversarial cases covered
+The manager records the five final full-gate executions in Linear. A red execution invalidates the release gate until corrected and repeated.
 
-- Missing policy evidence is synthesized and blocks the release.
-- Billing files trigger critical-risk requirements.
-- A human exception preserves unresolved blockers and rationale.
-- Explicit human block wins over otherwise passing evidence.
-- Modified webhook bodies fail timing-safe HMAC verification.
-- Duplicate webhook event IDs return a successful duplicate response without mutating evidence again.
-- Empty GitHub check sets remain pending.
-- Missing Linear acceptance criteria fail the intent gate.
-- Provider requests abort after a hard timeout.
-- A new billing release can be created, policy-selected, and enriched with manual evidence through the real browser.
+## Adversarial and correctness coverage
 
-## Defects discovered and resolved
+- Billing, authentication, permission, database, API, and UI file paths select adaptive release requirements.
+- Missing required evidence blocks a release deterministically.
+- Explicit blocks and documented exceptions remain visible in the audit trail.
+- GitHub checks in progress remain pending rather than being mislabeled failed.
+- Release Room’s own outbound GitHub check cannot satisfy its incoming CI evidence.
+- GitHub repository, PR, and commit context is derived from each release candidate.
+- Linear reads the issue linked to the candidate rather than a global demo issue.
+- Vercel evidence is accepted only for a matching commit; the newest unrelated deployment is never used as a fallback.
+- Sequential duplicate provider deliveries are rejected before evidence mutation.
+- Modified signatures and stale Linear webhook timestamps are rejected.
+- Provider payloads are bounded and outbound reads time out.
+- Release input rejects cross-repository PRs, invalid commit SHAs, non-issue Linear links, traversal paths, and excessive file lists.
+- Unauthenticated server actions redirect to login before creating releases, refreshing providers, changing evidence, or recording decisions.
+- Hosted mode fails closed without explicit access, session, and evidence-webhook secrets.
+- Liveness and database readiness are independently observable.
 
-1. Evidence denominators did not meet the desired contrast threshold. Contrast was increased.
-2. Policy-synthesized evidence affected the decision count but was not visible in group totals or the evidence room. The UI now uses the same effective evidence set as the decision engine.
-3. Secure cookies were enabled for every production-mode localhost test, preventing the private session from persisting over HTTP. Secure cookies now activate for hosted HTTPS deployments or an explicit secure-cookie flag.
-4. Duplicate webhook events updated evidence timestamps despite audit idempotency. Duplicate event IDs are now rejected before any evidence mutation.
-5. The isolated Chromium version initially required a newer Node patch version and could close during tests. A Node-compatible isolated Chromium release is pinned.
+## Real-user workflow coverage
+
+- A founder can sign in, understand the active blocker, pause/resume/refresh the live command center, and open the evidence room.
+- A release can be created from repository-specific identifiers and changed files.
+- Manual evidence can be added and reflected in the decision.
+- Integration onboarding distinguishes fixture, configured, connected, stale, and degraded states.
+- The integration page exposes endpoints, access boundaries, event counts, freshness, and last errors.
+- Desktop and mobile layouts preserve the core decision and action queue.
+- The public-repository/private-beta boundary remains consistent in product and marketing surfaces.
+
+## Defects discovered and resolved during hardening
+
+1. Duplicate provider deliveries could update evidence before idempotency was checked.
+2. Broad event matching could attach evidence to the wrong release candidate.
+3. Vercel backfill could select an unrelated newest deployment.
+4. GitHub and Linear backfill reused global demo identifiers across releases.
+5. Release Room’s own GitHub readiness check could become circular CI evidence.
+6. Configured credentials were displayed as a live connected integration before any verified event.
+7. Static session cookies were replayable indefinitely.
+8. Mutation server actions relied on page-layout authentication instead of enforcing the session themselves.
+9. New release inputs accepted identifiers that could never drive a reliable integration match.
+10. GitHub App credentials were advertised as configured although App installation authentication was not implemented.
+11. CI installs were not reproducible because the repository lacked a lockfile.
+12. Browser tests hard-coded the local demo key instead of using deployed configuration.
+13. Running GitHub checks were treated as failures rather than pending evidence.
+14. Marketing copy still described the public repository as closed-source.
+
+## Residual pilot boundaries
+
+- Authentication is designed for one trusted owner or a very small trusted team, not organizations and RBAC.
+- Provider secrets are environment-managed rather than installed through tenant OAuth.
+- Login throttling is process-local and should move to shared edge/durable enforcement before horizontal public deployment.
+- Sequential replay protection is covered; crash-safe distributed exactly-once ingestion is not claimed.
+- Production deployment remains manual and outside Release Room.
+- No public SLA, formal penetration-test attestation, or compliance certification is claimed.
 
 ## QA verdict
 
-**Approved for private single-owner dogfooding.** No unresolved critical or high defects remain. Public multi-tenant use requires the controls listed in the architecture memorandum.
+**Eligible for a controlled single-owner or very small trusted-team pilot after the final five-pass clean gate and manager approval.** It is not approved as a public multi-tenant self-serve SaaS.
