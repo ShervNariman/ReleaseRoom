@@ -4,6 +4,7 @@
   "private": true,
   "description": "Evidence-backed release assurance for small AI-native startup teams.",
   "scripts": {
+    "verify:workspace": "node scripts/verify-workspace.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -11,7 +12,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "e2e": "tsx scripts/run-e2e.ts",
-    "quality": "npm run lint && npm run typecheck && npm test && npm run build",
+    "quality": "npm run verify:workspace && npm run lint && npm run typecheck && npm test && npm run build",
     "quality:full": "npm run quality && npm run e2e",
     "marketing:capture": "tsx scripts/capture-marketing.ts",
     "marketing:record": "tsx scripts/record-marketing.ts",
