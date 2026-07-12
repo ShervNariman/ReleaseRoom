@@ -21,7 +21,7 @@ The repository includes:
 ```bash
 git clone https://github.com/ShervNariman/ReleaseRoom.git
 cd ReleaseRoom
-npm install
+npm ci
 cp .env.example .env.local
 npm run db:reset
 npm run dev
@@ -39,7 +39,7 @@ Open `ReleaseRoom.code-workspace` as its own Cursor workspace. Do not reuse the 
 6. Verify `GET /api/health` and `GET /api/ready` independently.
 7. Run `npm run quality:full` and the signed integration smoke harness.
 8. Confirm each provider moves from configured to connected only after a verified event.
-9. Enable outbound GitHub readiness checks only after the token or GitHub App has Checks write permission.
+9. Enable outbound GitHub readiness checks only after the configured token has Checks write permission.
 10. Keep production promotion manual; Release Room currently provides evidence and a decision, not deployment enforcement.
 
 ## Before broader customer exposure
