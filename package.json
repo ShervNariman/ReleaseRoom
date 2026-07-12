@@ -1,6 +1,6 @@
 {
   "name": "release-room",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Evidence-backed release assurance for small AI-native startup teams.",
   "scripts": {
@@ -12,8 +12,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "e2e": "tsx scripts/run-e2e.ts",
+    "audit:production": "npm audit --omit=dev --audit-level=high",
     "quality": "npm run verify:workspace && npm run lint && npm run typecheck && npm test && npm run build",
-    "quality:full": "npm run quality && npm run e2e",
+    "quality:full": "npm run quality && npm run e2e && npm run audit:production",
     "marketing:capture": "tsx scripts/capture-marketing.ts",
     "marketing:record": "tsx scripts/record-marketing.ts",
     "db:reset": "tsx scripts/reset-db.ts",

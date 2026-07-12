@@ -1,13 +1,42 @@
-# Build-in-public launch thread
+# Release Room demand-validation feeler
 
-1/ AI helped me produce more code. It did not remove the final founder question: **is this feature genuinely ready for customers?**
+## Primary post
 
-2/ GitHub can be green. Vercel can be live. Linear can say Done. An AI reviewer can approve. The mobile state, rollback plan, analytics, or promised failure path can still be missing.
+Your CI is green. The preview works. The PR was reviewed.
 
-3/ I built Release Room: an evidence-backed go/no-go workspace for small AI-native startup teams.
+But is the feature actually ready for customers?
 
-4/ It reads intent, code checks, human review, preview evidence, visual QA, operations proof, and launch readiness—then brings a person in only where judgment matters.
+I’m building Release Room — a release readiness tool for small AI-native startup teams.
 
-5/ The first private MVP is deliberately deterministic. AI can explain a release, but it cannot approve one behind your back.
+Would this help your team ship with more confidence?
 
-6/ I built the product through the same operating system it supports: Linear as source of truth, Cursor/Grok for implementation, independent QA and review, GitHub CI, and recorded evidence at every milestone.
+## First reply
+
+It pulls evidence from GitHub, Linear, Vercel, and coding agents, applies the right release policy, then shows exactly what is blocked and why.
+
+The private beta is being production-hardened now. I’m looking for a few small startup teams to pressure-test the workflow.
+
+## Optional second reply
+
+The use case I keep coming back to:
+
+A billing PR has green CI, a live preview, and an AI review—but mobile recovery, rollback ownership, or customer communication is still missing.
+
+Release Room should catch that before customers do.
+
+## Approved media
+
+Attach both approved 1920×1080 screenshots to the primary post in this order:
+
+1. `release-room-founder-dashboard.png`
+2. `release-room-evidence-room.png`
+
+Do not use the superseded 15-second demo or wedge image in the primary feeler.
+
+## Truthful boundaries
+
+- The GitHub repository is public.
+- The product is a controlled private beta/pilot.
+- The repository has no explicit license, so do not call it open source.
+- Do not claim multi-tenant onboarding, automatic Vercel production promotion, or public-GA readiness.
+- No hashtags, external link, or paid boost in the initial post.

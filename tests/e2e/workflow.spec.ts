@@ -1,4 +1,51 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { resetDatabase } from "@/lib/db";
-async function login(page: import("@playwright/test").Page) { await page.goto("/login"); await page.fill('input[name="accessKey"]', "release-room-private"); await page.getByRole("button", { name: "Open workspace" }).click(); await page.waitForURL("/"); }
-test("creates a risk-aware release and records human evidence", async ({ page }, testInfo) => { test.skip(testInfo.project.name !== "desktop", "Mutation workflow is validated once on desktop."); await login(page); await page.goto("/releases/new"); await page.fill('input[name="title"]', "QA billing release"); await page.fill('textarea[name="summary"]', "Validate the complete private MVP release workflow."); await page.fill('input[name="repository"]', "sherv/release-room"); await page.fill('input[name="branch"]', "feature/qa-billing"); await page.fill('input[name="commitSha"]', "abc1234"); await page.fill('textarea[name="changedFiles"]', "app/api/stripe/route.ts\ncomponents/billing/form.tsx"); await page.getByRole("button", { name: "Create release room" }).click(); await page.waitForURL(/\/releases\/qa-billing-release-/); await expect(page.getByText("Failure recovery")).toBeVisible(); await expect(page.getByText("Founder approval")).toBeVisible(); await page.fill('input[name="key"]', "recovery-path"); await page.fill('input[name="label"]', "Failure recovery"); await page.fill('textarea[name="description"]', "Recovery path was validated in the staging billing environment."); await page.selectOption('select[name="status"]', "passed"); await page.fill('input[name="owner"]', "QA"); await page.check('input[name="required"]'); await page.getByRole("button", { name: "Save evidence" }).click(); await expect(page.getByText("Evidence saved.")).toBeVisible(); await resetDatabase(); });
+
+const accessKey = process.env.RELEASE_ROOM_ACCESS_KEY ?? "release-room-private";
+
+async function login(page: import("@playwright/test").Page) {
+  await page.goto("/login");
+  await page.fill('input[name="accessKey"]', accessKey);
+  await page.getByRole("button", { name: "Open workspace" }).click();
+  await page.waitForURL("/");
+}
+
+test("creates a risk-aware release and records human evidence", async (
+  { page },
+  testInfo,
+) => {
+  test.skip(
+    testInfo.project.name !== "desktop",
+    "Mutation workflow is validated once on desktop.",
+  );
+  await login(page);
+  await page.goto("/releases/new");
+  await page.fill('input[name="title"]', "QA billing release");
+  await page.fill(
+    'textarea[name="summary"]',
+    "Validate the complete private MVP release workflow.",
+  );
+  await page.fill('input[name="repository"]', "sherv/release-room");
+  await page.fill('input[name="branch"]', "feature/qa-billing");
+  await page.fill('input[name="commitSha"]', "abc1234");
+  await page.fill(
+    'textarea[name="changedFiles"]',
+    "app/api/stripe/route.ts\ncomponents/billing/form.tsx",
+  );
+  await page.getByRole("button", { name: "Create release room" }).click();
+  await page.waitForURL(/\/releases\/qa-billing-release-/);
+  await expect(page.getByText("Failure recovery")).toBeVisible();
+  await expect(page.getByText("Founder approval")).toBeVisible();
+  await page.fill('input[name="key"]', "recovery-path");
+  await page.fill('input[name="label"]', "Failure recovery");
+  await page.fill(
+    'textarea[name="description"]',
+    "Recovery path was validated in the staging billing environment.",
+  );
+  await page.selectOption('select[name="status"]', "passed");
+  await page.fill('input[name="owner"]', "QA");
+  await page.check('input[name="required"]');
+  await page.getByRole("button", { name: "Save evidence" }).click();
+  await expect(page.getByText("Evidence saved.")).toBeVisible();
+  await resetDatabase();
+});

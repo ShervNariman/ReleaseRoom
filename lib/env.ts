@@ -14,14 +14,9 @@ const schema = z.object({
   DATABASE_URL: z.string().default("file:release-room.db"),
   DATABASE_AUTH_TOKEN: z.string().optional(),
   GITHUB_TOKEN: z.string().optional(),
-  GITHUB_REPOSITORY: z.string().optional(),
-  GITHUB_PR_NUMBER: z.coerce.number().int().positive().optional(),
   GITHUB_WEBHOOK_SECRET: z.string().min(16).optional(),
-  GITHUB_APP_ID: z.string().optional(),
-  GITHUB_APP_PRIVATE_KEY: z.string().optional(),
   GITHUB_CHECKS_ENABLED: z.enum(["true", "false"]).default("false"),
   LINEAR_API_KEY: z.string().optional(),
-  LINEAR_ISSUE_ID: z.string().optional(),
   LINEAR_WEBHOOK_SECRET: z.string().min(16).optional(),
   VERCEL_TOKEN: z.string().optional(),
   VERCEL_PROJECT_ID: z.string().optional(),
@@ -30,7 +25,8 @@ const schema = z.object({
 });
 
 export const env = schema.parse(process.env);
-export const accessKey = env.RELEASE_ROOM_ACCESS_KEY ?? "release-room-private";
+export const accessKey =
+  env.RELEASE_ROOM_ACCESS_KEY ?? "release-room-private";
 export const sessionSecret =
   env.RELEASE_ROOM_SESSION_SECRET ?? "local-session-secret-only";
 export const webhookSecret =
