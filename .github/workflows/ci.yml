@@ -15,6 +15,7 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: package.json
+      - run: node scripts/verify-workspace.mjs
       - run: npm install --ignore-scripts
       - run: npm run lint
       - run: npm run typecheck
