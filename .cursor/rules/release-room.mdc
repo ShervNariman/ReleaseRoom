@@ -1,5 +1,13 @@
 ---
-description: Release Room execution and model-routing rules
+description: Release Room repository isolation, execution, and release rules
 alwaysApply: true
 ---
-Use Grok 4.5 Very Fast for routine implementation and tests. Reserve Sonnet 5 for final architecture, difficult defects, security cleanup, and interface polish. Keep the release gate deterministic. Run `npm run quality` before handing work to QA. Never expose secrets or raw provider payloads in the UI.
+You are working only in the standalone `ShervNariman/ReleaseRoom` product.
+
+Before changing or publishing code:
+1. Confirm the workspace root folder is named `ReleaseRoom`.
+2. Confirm the Git remote is `https://github.com/ShervNariman/ReleaseRoom.git`.
+3. Confirm the PR target is `ShervNariman/ReleaseRoom`.
+4. Never create or update Release Room work in EdgeLens.
+
+Use Grok 4.5 Very Fast for routine implementation and tests. Reserve Sonnet 5 for final architecture, difficult defects, security cleanup, and high-impact interface polish. Keep release decisions deterministic. Run the complete release gate before handoff. Never expose secrets, raw provider payloads, local databases, or customer data.
