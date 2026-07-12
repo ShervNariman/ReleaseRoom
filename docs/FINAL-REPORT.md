@@ -1,30 +1,81 @@
-# Release Room Private MVP — Completion Report
+# Release Room v3 — Controlled-Pilot Completion Report
 
-## Page 1 — Product and delivery
+## Product outcome
 
-Release Room is a production-oriented private MVP for small AI-native startup teams whose engineering output is increasing faster than their founders can confidently review it. The product does not compete with GitHub, Linear, Vercel, AI code reviewers, feature-flag platforms, or observability tools. It sits above them as the cross-functional release decision layer.
+Release Room is an evidence-backed go/no-go workspace for small AI-native startup teams whose code output is increasing faster than founders can confidently reconstruct customer readiness.
 
-The MVP demonstrates the wedge through a seeded billing release. GitHub-style checks, human review, a healthy preview, and a successful Stripe test all appear green. Release Room still blocks the candidate because the mobile recovery state is broken, failed-payment recovery has not been demonstrated, the support note is unacknowledged, and founder approval is missing. This makes the product value visible immediately: technical completion is necessary, but not sufficient for customer readiness.
+The product does not replace GitHub, Linear, Vercel, coding agents, AI reviewers, observability, analytics, or feature flags. It combines their evidence with human proof and deterministic policy to answer the cross-functional question those tools do not own: **is this feature genuinely ready for customers?**
 
-The founder dashboard is intentionally minimalist. A decision hero states READY, NEEDS ATTENTION, or BLOCKED. Five evidence groups—Intent, Engineering, Experience, Operations, and Launch—show proof coverage. The action queue hides routine success and surfaces only human work. A release path shows progress from intent through observation. Risk policies are selected automatically from changed files, so a content edit remains lightweight while billing, authentication, permissions, public APIs, and database migrations require stronger proof.
+The founder command center keeps the wedge visible. A release can have green CI, a healthy preview, and review approval while remaining blocked by missing mobile recovery, rollback ownership, launch communication, analytics, or founder approval. Routine success is compressed; unresolved human work is elevated.
 
-The product includes an evidence room for each release, manual proof capture, provider refresh, approvals, blocks, exceptions with mandatory rationale, and a durable audit timeline. A new-release workflow lets a founder create a candidate from repository context and changed files. The integration screen communicates live versus fixture mode and the exact permissions each connection requires.
+## Implemented controlled-pilot capability
 
-GitHub, Linear, and Vercel adapters are server-only and bounded by hard timeouts. GitHub contributes CI and human-review evidence; an empty check set cannot pass. Linear contributes product intent; missing acceptance criteria fails. Vercel contributes the deployed preview. A generic HMAC-signed webhook lets GitHub Actions, n8n, Make, EdgeLens, SlopCheck, or internal tools submit normalized evidence without a bespoke integration.
+- Founder command center with ready, needs-attention, and blocked decisions
+- Adaptive policies for UI, billing, authentication, permission, API, and database changes
+- Intent, engineering, experience, operations, and launch evidence groups
+- Release creation from validated repository, branch, commit, PR, Linear issue, preview, and changed-file context
+- Release-specific GitHub checks and current human-review evidence
+- Release-specific Linear acceptance-criteria evidence
+- Vercel deployment evidence only for a matching release commit
+- Signed GitHub, Linear, Vercel, editor, and generic evidence ingestion
+- Manual evidence, approvals, blocks, and documented exceptions
+- Durable SQLite/libSQL-compatible release, evidence, integration-event, and audit history
+- Truthful integration states: fixture, configured, connected, stale, and degraded
+- Signed, issued, expiring private sessions and session enforcement inside mutation actions
+- Login throttling, production security headers, bounded payloads, provider timeouts, liveness, and database readiness
+- Locked dependencies and a full clean CI release gate
 
-## Page 2 — Quality, security, marketing, and next steps
+## Integration correctness
 
-The private access model uses a long access key and HttpOnly signed session cookie. Provider credentials never reach the browser. The webhook body is capped at 64 KiB, verified before parsing, validated with Zod, and written idempotently. The decision engine is deterministic: AI can later explain findings or draft launch communication, but it cannot silently approve a release. Human exceptions preserve the unresolved blockers and the rationale in the audit record.
+Provider context is derived from each release candidate rather than global demo identifiers. Matching uses the strongest available identifiers and rejects ambiguous results. Repository-only events cannot silently bind to the newest release.
 
-The repository includes strict TypeScript, ESLint, Vitest unit coverage, a production build, Playwright desktop and exact mobile-responsive flows, and axe-core accessibility smoke testing. The QA lane tests the founder dashboard, evidence room, recording route, and serious/critical accessibility findings. CI repeats lint, type checking, tests, and the build on every pull request and push to main.
+Vercel never substitutes an unrelated newest deployment. GitHub’s own Release Room readiness check is excluded from incoming CI evidence. Running checks remain pending. A token or signing secret marks a provider configured; only a verified event marks it connected.
 
-Marketing is a first-class deliverable. The `/record/release-room` route presents the wedge in a clean, self-contained frame. Automated scripts capture the product story, login, founder dashboard, and evidence room. A second script turns deterministic scene captures into a WebM demo using the system FFmpeg. The repository also contains a shot list, launch-thread draft, architecture memorandum, build journal, and reproducible instructions, so future public updates can show both progress and proof.
+The supported GitHub pilot path is a least-privilege token and/or signed webhook. GitHub App installation authentication and OAuth onboarding are not claimed.
 
-The private MVP is deliberately single-owner and fixture-friendly. It is ready to dogfood against real provider credentials and validate whether the release-decision workflow saves founder review time or prevents avoidable mistakes. A public MVP should next add GitHub App and Linear/Vercel OAuth installations, workspace isolation, encrypted credential storage, durable hosted database backups, queues for provider sync and screenshot capture, rate limiting, outbound GitHub/Vercel gate writes, Slack approvals, Sentry observation windows, PostHog adoption confirmation, and public-safe release receipts.
+## Security and data integrity
 
-The recommended validation target is five to ten small teams that deploy several times per week and still rely on a founder or senior engineer to reconstruct release readiness manually. The product earns its purchase when it does either of two things: returns several hours of senior review time each month, or prevents one customer-facing release the team would have regretted.
+The decision engine remains deterministic. AI and external providers can contribute evidence or explanations, but they cannot silently redefine policy or become the source of truth for the final decision.
 
+Hosted deployments fail closed unless explicit access, session, and generic evidence-webhook secrets are supplied. Session cookies are HttpOnly, signed, issued with a server-validated lifetime, and secure on hosted HTTPS. Private mutation actions enforce the session internally.
 
-## Final verification snapshot
+Provider webhooks verify signatures before parsing, reject stale Linear deliveries, bound raw payload size, validate normalized content, and reject normal sequential retries before evidence mutation. Distributed crash-safe exactly-once processing is not claimed for this pilot.
 
-The release candidate completed the final gate with zero lint warnings, strict TypeScript passing, 12 unit tests passing, five desktop browser tests passing, four mobile browser tests passing with one desktop-only mutation flow skipped by design, no critical or serious accessibility findings, a clean production build, and zero reported production dependency vulnerabilities. Marketing capture produced four screenshots and a ten-second WebM product demo.
+## Real-user experience
+
+The integration page explains what is merely configured, what has proven itself live, what is stale, and what is degraded. It shows endpoints, access boundaries, event counts, last verified activity, and last errors.
+
+The new-release workflow prevents identifiers that would create unreliable evidence matching. Errors are shown inline and the interface explains why repository, commit, linked records, and changed files matter.
+
+Desktop, 390px mobile, keyboard-oriented interaction, and automated accessibility remain part of the release gate. The approved marketing source of truth is the founder command-center screenshot followed by the evidence-room screenshot. The rejected demo is not used in the primary feeler.
+
+## Delivery and governance
+
+The standalone public repository is `ShervNariman/ReleaseRoom`. The product remains a controlled private beta/pilot. The repository has no explicit license and must not be described as open source.
+
+The v3 manager, integration, security, real-user, resilience, and final-review workstreams are controlled in the Release Room v3 Linear project. The release branch is merged only after the same complete clean gate passes five final executions and the manager records a go decision.
+
+## Quality gate
+
+The locked GitHub Actions gate covers:
+
+1. Standalone ReleaseRoom workspace verification
+2. Reproducible `npm ci` installation
+3. ESLint with zero warnings
+4. Strict TypeScript
+5. Unit and integration contracts
+6. Production build
+7. Desktop, 390px mobile, and accessibility browser regression
+8. Production dependency audit at the high-severity threshold
+
+Failure diagnostics are retained as artifacts. The final five-pass record is maintained in Linear so the repository does not need another commit after the validated head.
+
+## Approved deployment boundary
+
+Release Room v3 is suitable for controlled use by one trusted owner or a very small trusted team with environment-managed provider credentials and manual production promotion.
+
+It is not approved or marketed as a public multi-tenant self-serve SaaS. Broader exposure requires organization membership, RBAC, tenant isolation, OAuth installation, customer secret management, distributed abuse controls, durable queues/outbox processing, backup and restore drills, operational alerting, an external security review, and a support/SLA model.
+
+## Final verdict
+
+**Pilot-ready after the final five-pass clean gate and manager approval.** The core release-readiness workflow is production-oriented and truthful within that boundary; the residual work is expansion architecture rather than an undisclosed defect in the pilot wedge.
