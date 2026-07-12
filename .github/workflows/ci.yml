@@ -1,13 +1,25 @@
 name: Release Room quality
+
 on:
   pull_request:
   push:
     branches: [main]
+
+concurrency:
+  group: release-room-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: read
+    env:
+      RELEASE_ROOM_ACCESS_KEY: release-room-ci-access-key
+      RELEASE_ROOM_SESSION_SECRET: release-room-ci-session-secret
+      RELEASE_ROOM_WEBHOOK_SECRET: release-room-ci-webhook-secret
+      RELEASE_ROOM_ENFORCE_STRONG_SECRETS: "true"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -15,9 +27,29 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: package.json
-      - run: node scripts/verify-workspace.mjs
-      - run: npm install --ignore-scripts
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run build
+      - name: Verify standalone workspace
+        run: node scripts/verify-workspace.mjs
+      - name: Install dependencies
+        run: npm install --ignore-scripts
+      - name: Lint
+        run: npm run lint
+      - name: Strict TypeScript
+        run: npm run typecheck
+      - name: Unit and integration tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: Desktop, mobile, and accessibility browser tests
+        run: npm run e2e
+      - name: Production dependency audit
+        run: npm run audit:production
+      - name: Upload browser diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-diagnostics
+          path: |
+            test-results
+            playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
