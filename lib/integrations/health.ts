@@ -14,7 +14,7 @@ const permissions: Record<IntegrationProvider, string[]> = {
   github: [
     "Read checks and reviews for the repository linked to each release",
     "Receive signed repository webhooks",
-    "Optional: publish Release Room checks through a GitHub App",
+    "Optional: publish Release Room checks with a token that has Checks write permission",
   ],
   linear: [
     "Read the issue linked to each release",
@@ -33,11 +33,7 @@ const permissions: Record<IntegrationProvider, string[]> = {
 
 function configured(provider: IntegrationProvider) {
   if (provider === "github") {
-    return Boolean(
-      env.GITHUB_TOKEN ||
-        env.GITHUB_WEBHOOK_SECRET ||
-        (env.GITHUB_APP_ID && env.GITHUB_APP_PRIVATE_KEY),
-    );
+    return Boolean(env.GITHUB_TOKEN || env.GITHUB_WEBHOOK_SECRET);
   }
   if (provider === "linear") {
     return Boolean(env.LINEAR_API_KEY || env.LINEAR_WEBHOOK_SECRET);
