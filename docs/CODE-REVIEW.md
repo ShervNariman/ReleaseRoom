@@ -2,7 +2,7 @@
 
 ## Review scope
 
-The production-hardening diff was reviewed for deterministic decisions, release identity, provider correctness, replay behavior, authentication, server-action authorization, persistence, failure isolation, truthful capability boundaries, accessibility, CI reproducibility, dependency health, and operational readiness.
+The production-hardening diff was reviewed for deterministic decisions, release identity, provider correctness, replay behavior, authentication, server-action authorization, policy integrity, persistence, failure isolation, truthful capability boundaries, accessibility, CI reproducibility, dependency health, and operational readiness.
 
 ## High-risk findings resolved
 
@@ -34,21 +34,26 @@ Credentials and secrets produce `configured`, not `connected`. A verified event 
 
 Static session values were replaced by issued, signed, expiring tokens. Private mutation server actions now enforce the session internally rather than relying only on layout redirects. Invalid access-key attempts are throttled per process.
 
-### 8. Hosted security and operations lacked explicit boundaries
+### 8. Evidence could weaken a resolved policy
+
+An observed item using a policy key could overwrite the policy-owned `required`, category, or label fields. Effective evidence now takes those fields from the deterministic resolved policy while retaining the observed status, description, source, owner, and timestamp. Policy relaxation requires a visible documented exception rather than a silent evidence edit.
+
+### 9. Hosted security and operations lacked explicit boundaries
 
 Hosted mode requires explicit access, session, and webhook secrets. Production security headers are global. Liveness and database readiness are separate. Integration event reads are bounded.
 
-### 9. Dependency installation was non-deterministic
+### 10. Dependency installation was non-deterministic
 
 A generated lockfile is committed. CI uses `npm ci` with read-only repository permissions and retains diagnostics on failure.
 
-### 10. Capability claims exceeded implementation
+### 11. Capability claims exceeded implementation
 
 GitHub App configuration was removed because installation authentication is not implemented. The supported pilot path uses a least-privilege GitHub token and/or signed webhook. The repository is public, the product is a private beta, and no open-source claim is made without a license.
 
 ## Design qualities retained
 
 - Policy selection and release decisions remain deterministic.
+- Policy-owned requirements cannot be downgraded by observed evidence.
 - AI and provider systems contribute evidence or explanation; they do not become the source of truth for the final decision.
 - Provider adapters execute server-side with bounded payloads and timeouts.
 - Partial provider refresh failures do not discard successful evidence.
