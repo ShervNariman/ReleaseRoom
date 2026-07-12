@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "projectId": "releaseroom",
+  "repository": "ShervNariman/ReleaseRoom",
+  "localFolderCandidates": ["ReleaseRoom", "releaseroom"],
+  "clientEnvFile": ".env.local",
+  "allowedCapabilities": ["general", "reasoning", "review", "summarization"],
+  "allowModelOverride": false,
+  "enabled": true,
+  "privacyClass": "engineering-evidence",
+  "activation": "registered-inactive",
+  "credentialSource": "local-only"
+}
