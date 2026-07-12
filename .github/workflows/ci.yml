@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
-      contents: write
+      contents: read
     env:
       RELEASE_ROOM_ACCESS_KEY: release-room-ci-access-key
       RELEASE_ROOM_SESSION_SECRET: release-room-ci-session-secret
@@ -22,48 +22,40 @@ jobs:
       RELEASE_ROOM_ENFORCE_STRONG_SECRETS: "true"
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref || github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: package.json
+          cache-dependency-path: package-lock.json
       - name: Verify standalone workspace
         run: node scripts/verify-workspace.mjs
-      - name: Install dependencies
-        run: npm install --ignore-scripts
-      - name: Commit generated dependency lock
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        run: |
-          if git ls-files --error-unmatch package-lock.json >/dev/null 2>&1; then
-            echo "package-lock.json is already tracked"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          git commit -m "chore: lock production dependencies"
-          git push origin HEAD:${{ github.head_ref }}
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts 2>&1 | tee install.log
       - name: Lint
-        run: npm run lint
+        run: npm run lint 2>&1 | tee lint.log
       - name: Strict TypeScript
         run: npm run typecheck 2>&1 | tee typecheck.log
       - name: Unit and integration tests
-        run: npm test
+        run: npm test 2>&1 | tee test.log
       - name: Production build
-        run: npm run build
+        run: npm run build 2>&1 | tee build.log
       - name: Desktop, mobile, and accessibility browser tests
-        run: npm run e2e
+        run: npm run e2e 2>&1 | tee e2e.log
       - name: Production dependency audit
-        run: npm run audit:production
+        run: npm run audit:production 2>&1 | tee audit.log
       - name: Upload quality diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: quality-diagnostics
           path: |
+            install.log
+            lint.log
             typecheck.log
+            test.log
+            build.log
+            e2e.log
+            audit.log
             test-results
             playwright-report
           if-no-files-found: ignore
