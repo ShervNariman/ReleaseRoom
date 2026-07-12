@@ -1,16 +1,20 @@
-# Standalone repository and Cursor environment
+# Standalone repository, Cursor workspace, and deployment
 
-Release Room now lives in the private GitHub repository:
+Release Room lives in the public GitHub repository:
 
 `ShervNariman/ReleaseRoom`
+
+The product itself remains a controlled private beta/pilot. The repository currently has no explicit software license, so public visibility must not be described as open-source licensing.
 
 The repository includes:
 
 - dedicated Cursor rules under `.cursor/rules/`;
-- `AGENTS.md` with model routing and repository boundaries;
-- GitHub Actions quality gates;
-- signed GitHub, Linear, Vercel, and editor evidence integrations;
-- a live founder dashboard and deterministic release policy engine.
+- `AGENTS.md` with model routing and hard repository boundaries;
+- GitHub Actions production-readiness gates;
+- signed GitHub, Linear, Vercel, generic-webhook, and editor evidence paths;
+- a founder command center and deterministic release-policy engine;
+- separate liveness and database-readiness endpoints;
+- a five-loop production-readiness record.
 
 ## Local setup
 
@@ -23,13 +27,21 @@ npm run db:reset
 npm run dev
 ```
 
-Open this folder as its own Cursor workspace. Do not reuse the EdgeLens workspace for Release Room tasks.
+Open `ReleaseRoom.code-workspace` as its own Cursor workspace. Do not reuse the EdgeLens workspace for Release Room tasks.
 
-## Deployment checklist
+## Controlled pilot deployment checklist
 
-1. Configure strong access, session, and webhook secrets.
+1. Configure strong, unique access, session, and evidence-webhook secrets.
 2. Configure a durable libSQL/Turso database for hosted use.
-3. Add GitHub, Linear, and Vercel credentials or webhook secrets.
+3. Add the minimum GitHub, Linear, and Vercel credentials or signing secrets required for the pilot.
 4. Set `RELEASE_ROOM_PUBLIC_URL` to the hosted HTTPS URL.
-5. Run `npm run quality:full` and `npm run smoke:integrations`.
-6. Enable GitHub readiness-check publishing only after the token or GitHub App has Checks write permission.
+5. Link every release to its own repository, commit, PR, Linear issue, and preview where available.
+6. Verify `GET /api/health` and `GET /api/ready` independently.
+7. Run `npm run quality:full` and the signed integration smoke harness.
+8. Confirm each provider moves from configured to connected only after a verified event.
+9. Enable outbound GitHub readiness checks only after the token or GitHub App has Checks write permission.
+10. Keep production promotion manual; Release Room currently provides evidence and a decision, not deployment enforcement.
+
+## Before broader customer exposure
+
+Do not expand beyond a controlled pilot until tenant isolation, organization membership, RBAC, OAuth installation, shared durable abuse controls, customer secret management, operational alerting, backup/restore, and an external security review are deliberately implemented.
