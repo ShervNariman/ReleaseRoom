@@ -10,7 +10,11 @@ export type EvidenceStatus = "passed" | "warning" | "failed" | "pending";
 export type ReleaseDecision = "ready" | "needs_attention" | "blocked";
 export type RiskLevel = "low" | "medium" | "high" | "critical";
 export type IntegrationProvider =
-  "github" | "linear" | "vercel" | "editor" | "webhook";
+  | "github"
+  | "linear"
+  | "vercel"
+  | "editor"
+  | "webhook";
 
 export type EvidenceItem = {
   id: string;
@@ -91,9 +95,11 @@ export type IntegrationEvent = {
 export type IntegrationHealth = {
   provider: IntegrationProvider;
   name: string;
-  status: "connected" | "fixture" | "degraded" | "stale";
+  status: "connected" | "configured" | "fixture" | "degraded" | "stale";
   detail: string;
   lastSync?: string | null;
+  lastSuccess?: string | null;
+  lastError?: string | null;
   eventCount?: number;
   endpoint?: string;
   permissions: string[];
