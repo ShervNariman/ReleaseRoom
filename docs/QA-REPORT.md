@@ -27,6 +27,7 @@ The manager records the five final full-gate executions in Linear. A red executi
 
 - Billing, authentication, permission, database, API, and UI file paths select adaptive release requirements.
 - Missing required evidence blocks a release deterministically.
+- Observed evidence cannot unset or rewrite policy-owned requirement fields.
 - Explicit blocks and documented exceptions remain visible in the audit trail.
 - GitHub checks in progress remain pending rather than being mislabeled failed.
 - Release Room’s own outbound GitHub check cannot satisfy its incoming CI evidence.
@@ -61,12 +62,13 @@ The manager records the five final full-gate executions in Linear. A red executi
 6. Configured credentials were displayed as a live connected integration before any verified event.
 7. Static session cookies were replayable indefinitely.
 8. Mutation server actions relied on page-layout authentication instead of enforcing the session themselves.
-9. New release inputs accepted identifiers that could never drive a reliable integration match.
-10. GitHub App credentials were advertised as configured although App installation authentication was not implemented.
-11. CI installs were not reproducible because the repository lacked a lockfile.
-12. Browser tests hard-coded the local demo key instead of using deployed configuration.
-13. Running GitHub checks were treated as failures rather than pending evidence.
-14. Marketing copy still described the public repository as closed-source.
+9. Observed evidence could unset policy-owned requirement fields.
+10. New release inputs accepted identifiers that could never drive a reliable integration match.
+11. GitHub App credentials were advertised as configured although App installation authentication was not implemented.
+12. CI installs were not reproducible because the repository lacked a lockfile.
+13. Browser tests hard-coded the local demo key instead of using deployed configuration.
+14. Running GitHub checks were treated as failures rather than pending evidence.
+15. Marketing copy still described the public repository as closed-source.
 
 ## Residual pilot boundaries
 
