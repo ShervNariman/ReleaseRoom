@@ -31,7 +31,7 @@ The current product is appropriate for controlled single-owner pilots. It is not
 ## Start locally
 
 ```bash
-npm install
+npm ci
 cp .env.example .env.local
 npm run db:reset
 npm run dev
@@ -45,7 +45,7 @@ Open `http://localhost:3000/login`. The local-only demo key is `release-room-pri
 npm run quality:full
 ```
 
-The full gate verifies the standalone ReleaseRoom workspace, lint, strict TypeScript, unit and contract tests, production build, desktop/mobile/accessibility browser flows, and the production dependency audit.
+The full gate verifies the standalone ReleaseRoom workspace, locked dependencies, lint, strict TypeScript, unit and contract tests, production build, desktop/mobile/accessibility browser flows, and the production dependency audit.
 
 ## Connect providers
 
@@ -61,7 +61,7 @@ Release Room derives provider context from the release itself. It does not reuse
 
 Provider roles:
 
-- **GitHub:** checks and current human approvals for the linked commit and PR
+- **GitHub:** checks and current human approvals for the linked commit and PR; outbound readiness checks require a token with Checks write permission
 - **Linear:** acceptance criteria from the linked issue
 - **Vercel:** deployment evidence only when the deployment commit matches the release
 
@@ -97,4 +97,4 @@ The earlier 15-second demo is superseded for the initial X feeler. Marketing gov
 
 Release Room does not replace GitHub, Linear, Vercel, CodeRabbit, Sentry, PostHog, or LaunchDarkly. It uses their evidence to answer the cross-functional question they do not own: **is this feature genuinely ready for customers?**
 
-Current residual boundaries are documented in `docs/PRODUCTION-READINESS.md`. The most important are single-owner authentication, environment-managed provider credentials, no tenant isolation, and no automatic production-deployment enforcement.
+Current residual boundaries are documented in `docs/PRODUCTION-READINESS.md`. The most important are single-owner authentication, environment-managed provider credentials, no tenant isolation, no GitHub App/OAuth installation flow, and no automatic production-deployment enforcement.
